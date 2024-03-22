@@ -261,6 +261,10 @@ class LSTM(Layer):
         self.h2u = Linear(H, in_size=H, nobias=True)
         self.reset_state()
 
+    def set_state(self, state):
+        self.h = state[0]
+        self.c = state[1]
+
     def reset_state(self):
         self.h = None
         self.c = None
