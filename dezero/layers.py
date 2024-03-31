@@ -261,15 +261,13 @@ class LSTM(Layer):
         self.h2u = Linear(H, in_size=H, nobias=True)
         self.reset_state()
 
-    def set_state(self, state):
-        self.h = state[0]
-        self.c = state[1]
-
     def reset_state(self):
         self.h = None
         self.c = None
 
-    def forward(self, x):
+    def forward(self, x, h=None, c=None):
+        if not (h is None) and not (c is None):
+            self.h, self.c = h, c
         if self.h is None:
             f = F.sigmoid(self.x2f(x))
             i = F.sigmoid(self.x2i(x))
@@ -282,14 +280,14 @@ class LSTM(Layer):
             u = F.tanh(self.x2u(x) + self.h2u(self.h))
 
         if self.c is None:
-            c_new = (i * u)
+            c_new = i * u
         else:
             c_new = (f * self.c) + (i * u)
 
         h_new = o * F.tanh(c_new)
 
         self.h, self.c = h_new, c_new
-        return h_new
+        return h_new, c_new
 
 
 # =============================================================================
